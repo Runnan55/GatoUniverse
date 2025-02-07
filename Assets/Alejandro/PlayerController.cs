@@ -48,27 +48,44 @@ public class PlayerController : MonoBehaviour
     {
         if (currentGravityWell == null) return;
 
+        // Dirección de la gravedad (hacia el centro del planeta)
         Vector3 gravityDirection = (currentGravityWell.transform.position - transform.position).normalized;
         Vector3 playerUp = -gravityDirection;
-        Vector3 forward = Vector3.Cross(transform.right, playerUp).normalized;
 
-        Quaternion targetRotation = Quaternion.LookRotation(forward, playerUp);
+        // Mantener la rotación del jugador en relación con la gravedad
+        Quaternion targetRotation = Quaternion.FromToRotation(transform.up, playerUp) * transform.rotation;
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
     }
 
     void MovePlayer()
     {
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
+        float horizontal = Input.GetAxisRaw("Horizontal");
+        float vertical = Input.GetAxisRaw("Vertical");
 
-        Vector3 moveDirection = transform.forward * vertical + transform.right * horizontal;
+        if (currentGravityWell == null) return; // Asegurar que hay un GravityWell asignado
+
+        // Obtener la dirección de la gravedad basada en el planeta
+        Vector3 gravityUp = (transform.position - currentGravityWell.transform.position).normalized;
+
+        // Obtener las direcciones locales alineadas con la superficie correctamente
+        Vector3 localForward = Vector3.ProjectOnPlane(transform.forward, gravityUp).normalized;
+        Vector3 localRight = Vector3.Cross(gravityUp, localForward).normalized;
+
+        // Direcciones de movimiento ajustadas a la curvatura del planeta
+        Vector3 moveDirection = (localForward * vertical + localRight * horizontal).normalized;
+
+        // Aplicar el movimiento
         rb.MovePosition(rb.position + moveDirection * moveSpeed * Time.deltaTime);
 
+        // Saltar si está en el suelo
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             Jump();
         }
     }
+
+
+
 
     void Jump()
     {
