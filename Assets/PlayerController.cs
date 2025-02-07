@@ -17,6 +17,15 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
         rb.constraints = RigidbodyConstraints.FreezeRotation;
+
+        // Intentar encontrar un GravityWell cercano al iniciar
+        GravityWell initialWell = FindFirstObjectByType<GravityWell>();
+
+        if (initialWell != null)
+        {
+            currentGravityWell = initialWell;
+            Debug.Log($"Gravedad inicial establecida en {currentGravityWell.gameObject.name}");
+        }
     }
 
     void FixedUpdate()
@@ -25,6 +34,10 @@ public class PlayerController : MonoBehaviour
         {
             currentGravityWell.ApplyGravity(rb);
             AlignToGravity();
+        }
+        else
+        {
+            Debug.LogWarning("No hay ningún GravityWell asignado. El jugador está en el vacío.");
         }
 
         MovePlayer();
@@ -35,16 +48,10 @@ public class PlayerController : MonoBehaviour
     {
         if (currentGravityWell == null) return;
 
-        // Dirección de la gravedad (del jugador hacia el centro de la esfera)
         Vector3 gravityDirection = (currentGravityWell.transform.position - transform.position).normalized;
-
-        // Orientamos la parte superior del jugador en dirección contraria a la gravedad
         Vector3 playerUp = -gravityDirection;
-
-        // Orientamos la parte delantera del jugador en la dirección de movimiento
         Vector3 forward = Vector3.Cross(transform.right, playerUp).normalized;
 
-        // Aplicamos la rotación suavemente para evitar movimientos bruscos
         Quaternion targetRotation = Quaternion.LookRotation(forward, playerUp);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
     }
@@ -79,16 +86,12 @@ public class PlayerController : MonoBehaviour
         Vector3 gravityDirection = (transform.position - currentGravityWell.transform.position).normalized;
         RaycastHit hit;
 
-        // Utilizamos SphereCast para detectar el suelo con más precisión
         isGrounded = Physics.SphereCast(transform.position, groundCheckRadius, -gravityDirection, out hit, groundCheckDistance);
-
-        // Debugging visual: dibuja una línea para ver si el raycast funciona correctamente
         Debug.DrawRay(transform.position, -gravityDirection * groundCheckDistance, isGrounded ? Color.green : Color.red);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        // Solo cambiar la gravedad si tocamos un nuevo GravityWell
         GravityWell well = other.GetComponent<GravityWell>();
         if (well != null)
         {

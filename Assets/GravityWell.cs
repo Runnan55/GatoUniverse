@@ -28,7 +28,7 @@ public class GravityWell : MonoBehaviour
         }
     }
 
-    private void ApplyGravity(Rigidbody rb)
+    public void ApplyGravity(Rigidbody rb)
     {
         Vector3 gravityDirection = (transform.position - rb.position).normalized;
         rb.AddForce(gravityDirection * gravityStrength, ForceMode.Acceleration);
