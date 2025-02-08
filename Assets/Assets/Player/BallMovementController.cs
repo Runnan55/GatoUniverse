@@ -9,7 +9,7 @@ public class BallMovementController : MonoBehaviour
     private float movementForce = 20f;
     private Vector2 inputDirection = Vector2.zero;
     private float currentMaxForwardVelocity;
-    private float maxForwardVelocity = 10;
+    private float maxForwardVelocity = 30;
     private float maxHorizontalVelocity = 60;
 
     private float maxBoostedForwardVelocity = 150;
