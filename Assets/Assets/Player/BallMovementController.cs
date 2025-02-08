@@ -7,14 +7,16 @@ public class BallMovementController : MonoBehaviour
     private Rigidbody rb;
     public float extraGravityForce = 30f;
     private bool enabledExtraGravity = false;
+    private float simulatedFriction = 0.15f;
 
-    private float passiveForce = 10.0f;
+    private float passiveForce = 6.0f;
     private float passiveVelocityMult = 0.8f;
     private float currentPassiveMult = 1.0f;
     private float movementForce = 20f;
+    private float horizontalMovementForce = 60.0f;
     private Vector2 inputDirection = Vector2.zero;
     private float maxForwardVelocity = 30;
-    private float maxHorizontalVelocity = 60;
+    private float maxHorizontalVelocity = 200;
 
     private float boostVelocityMultiplier = 3;
     private float boostDuration = 2;
@@ -62,21 +64,25 @@ public class BallMovementController : MonoBehaviour
         {
             rb.AddForce(Vector3.up * -1 * extraGravityForce);
         }
-        if (inputDirection != Vector2.zero && canControl) 
+        if (inputDirection.y != 0 && canControl && rb.linearVelocity.z < CurrentMaxForwardVelocity()) 
         {
             if (inputDirection.y != 0)
-                rb.AddForce(new Vector3(inputDirection.x, 0, inputDirection.y) * movementForce);
+                rb.AddForce(new Vector3(0, 0, inputDirection.y * movementForce));
             else if (inputDirection.y == 0)
-                rb.AddForce(new Vector3(inputDirection.x * movementForce, 0, passiveForce));
+                rb.AddForce(new Vector3(0, 0, passiveForce));
+        }
+        if (inputDirection.x != 0 && canControl)
+        {
+            rb.AddForce(Vector3.right * inputDirection.x * horizontalMovementForce);
         }
 
-        if (rb.linearVelocity.z > CurrentMaxForwardVelocity())
+        if (rb.linearVelocity.z > CurrentMaxForwardVelocity() && !enabledExtraGravity)
         {
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, rb.linearVelocity.y, CurrentMaxForwardVelocity());
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, rb.linearVelocity.y, rb.linearVelocity.z - simulatedFriction);
         }
         if (Mathf.Abs(rb.linearVelocity.x) > maxHorizontalVelocity)
         {
-            rb.linearVelocity = new Vector3(Mathf.Sign(rb.linearVelocity.x), rb.linearVelocity.y, rb.linearVelocity.z);
+            rb.linearVelocity = new Vector3(Mathf.Sign(rb.linearVelocity.x) * maxHorizontalVelocity, rb.linearVelocity.y, rb.linearVelocity.z);
         }
     }
 
