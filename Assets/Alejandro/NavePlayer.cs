@@ -3,9 +3,15 @@ using UnityEngine;
 public class NavePlayer : MonoBehaviour
 {
     public Transform player; // Referencia al jugador
+    private Rigidbody rb;
     public Vector3 offset; // Desplazamiento de la cámara respecto al jugador
     public float cameraSpeed = 10f; // Velocidad de suavizado de la cámara
 
+
+    private void Start()
+    {
+        rb = player.gameObject.GetComponent<Rigidbody>();
+    }
     private void LateUpdate()
     {
         // Calcular la posición deseada
@@ -16,5 +22,6 @@ public class NavePlayer : MonoBehaviour
 
         // Asignar la posición final a la cámara
         transform.position = player.position;
+        transform.forward = rb.linearVelocity;
     }
 }
