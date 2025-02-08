@@ -22,7 +22,7 @@ public class Player1 : MonoBehaviour
             controller.DeactivateExtraGravity();
         }
 
-        controller.SetInputDirection(new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")));
+        controller.SetInputDirection(new Vector2(Input.GetAxis("Horizontal"), Mathf.Max(Input.GetAxis("Vertical"), 0)));
     }
 
 }
