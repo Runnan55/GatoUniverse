@@ -5,7 +5,7 @@ public class BallMovementController : MonoBehaviour
     private bool canControl = false;
 
     private Rigidbody rb;
-    private float extraGravityForce = 30f;
+    public float extraGravityForce = 30f;
     private bool enabledExtraGravity = false;
 
     private float passiveForce = 10.0f;
