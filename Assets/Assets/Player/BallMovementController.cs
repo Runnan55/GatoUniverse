@@ -2,10 +2,15 @@ using UnityEngine;
 
 public class BallMovementController : MonoBehaviour
 {
+    private bool canControl = false;
+
     private Rigidbody rb;
     private float extraGravityForce = 30f;
     private bool enabledExtraGravity = false;
 
+    private float passiveForce = 10.0f;
+    private float passiveVelocityMult = 0.8f;
+    private float currentPassiveMult = 1.0f;
     private float movementForce = 20f;
     private Vector2 inputDirection = Vector2.zero;
     private float maxForwardVelocity = 30;
@@ -53,13 +58,16 @@ public class BallMovementController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (enabledExtraGravity) 
+        if (enabledExtraGravity && canControl) 
         {
             rb.AddForce(Vector3.up * -1 * extraGravityForce);
         }
-        if (inputDirection != Vector2.zero) 
+        if (inputDirection != Vector2.zero && canControl) 
         {
-            rb.AddForce(new Vector3(inputDirection.x, 0, inputDirection.y) * movementForce);
+            if (inputDirection.y != 0)
+                rb.AddForce(new Vector3(inputDirection.x, 0, inputDirection.y) * movementForce);
+            else if (inputDirection.y == 0)
+                rb.AddForce(new Vector3(inputDirection.x * movementForce, 0, passiveForce));
         }
 
         if (rb.linearVelocity.z > CurrentMaxForwardVelocity())
@@ -74,7 +82,12 @@ public class BallMovementController : MonoBehaviour
 
     private float CurrentMaxForwardVelocity()
     {
-        return maxForwardVelocity * 
+        if (inputDirection.y > 0)
+            currentPassiveMult = 1;
+        else
+            currentPassiveMult = passiveVelocityMult;
+
+        return maxForwardVelocity * currentPassiveMult *
             Mathf.Lerp(1, boostVelocityMultiplier, currentBoostDuration / boostDuration) * 
             Mathf.Lerp(1, slowVelocityMultiplier, currentSlowDuration / slowDuration);
     }
@@ -92,5 +105,21 @@ public class BallMovementController : MonoBehaviour
     public void ActiveSlow()
     {
         currentSlowDuration = slowDuration;
+    }
+
+    public void ActiveMovement()
+    {
+        rb.isKinematic = false;
+    }
+
+    public void EnableControl()
+    {
+        canControl = true;
+    }
+
+    public void DisableControl()
+    {
+        canControl = false;
+        DeactivateExtraGravity();
     }
 }
