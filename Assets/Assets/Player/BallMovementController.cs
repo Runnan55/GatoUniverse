@@ -8,11 +8,19 @@ public class BallMovementController : MonoBehaviour
 
     private float movementForce = 20f;
     private Vector2 inputDirection = Vector2.zero;
-    private float maxForwardVelocity = 60;
+    private float currentMaxForwardVelocity;
+    private float maxForwardVelocity = 10;
     private float maxHorizontalVelocity = 60;
+
+    private float maxBoostedForwardVelocity = 150;
+    private float boostDuration = 2;
+    private float currentBoostDuration = 0;
+    private bool boosting = false;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        currentMaxForwardVelocity = maxForwardVelocity;
     }
 
     public void ActivateExtraGravity()
@@ -29,6 +37,14 @@ public class BallMovementController : MonoBehaviour
         this.inputDirection = inputDirection;
     }
 
+    private void Update()
+    {
+        if (!boosting && currentBoostDuration > 0) 
+        {
+            currentBoostDuration = Mathf.Max(currentBoostDuration - Time.deltaTime, 0);
+            currentMaxForwardVelocity = Mathf.Lerp(maxBoostedForwardVelocity, maxForwardVelocity, 1f - currentBoostDuration / boostDuration);
+        }
+    }
 
     private void FixedUpdate()
     {
@@ -41,9 +57,9 @@ public class BallMovementController : MonoBehaviour
             rb.AddForce(new Vector3(inputDirection.x, 0, inputDirection.y) * movementForce);
         }
 
-        if (rb.linearVelocity.z > maxForwardVelocity)
+        if (rb.linearVelocity.z > currentMaxForwardVelocity)
         {
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, rb.linearVelocity.y, maxForwardVelocity);
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, rb.linearVelocity.y, currentMaxForwardVelocity);
         }
         if (Mathf.Abs(rb.linearVelocity.x) > maxHorizontalVelocity)
         {
@@ -51,5 +67,16 @@ public class BallMovementController : MonoBehaviour
         }
     }
 
-
+    public void Boost()
+    {
+        boosting = true;
+        currentBoostDuration = boostDuration;
+        currentMaxForwardVelocity = maxBoostedForwardVelocity;
+        print("Start boosting");
+    }
+    public void StopBoost()
+    {
+        boosting = false;
+        print("Stop boosting");
+    }
 }

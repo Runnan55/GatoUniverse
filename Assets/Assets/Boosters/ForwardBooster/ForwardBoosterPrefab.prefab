@@ -96,6 +96,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8851760432374494660}
   - component: {fileID: 7873474053959469355}
+  - component: {fileID: 2704370414722070782}
   m_Layer: 0
   m_Name: ForwardBoosterPrefab
   m_TagString: Untagged
@@ -140,3 +141,16 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4, y: 0.4, z: 10}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2704370414722070782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4576865519163061223}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ff2ac0b5a3f99f40b186fad1a683332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boostFoce: 40

@@ -11,7 +11,9 @@ public class ForwardBooster : MonoBehaviour
     {
         if (other.tag == "Player")
         {
+            print("Added " + other.gameObject.name);
             balls.Add(other.gameObject);
+            other.GetComponent<BallMovementController>().Boost();
         }
     }
 
@@ -19,7 +21,9 @@ public class ForwardBooster : MonoBehaviour
     {
         if (other.tag == "Player")
         {
+            print("Removed " + other.gameObject.name);
             balls.Remove(other.gameObject);
+            other.GetComponent<BallMovementController>().StopBoost();
         }
     }
 
